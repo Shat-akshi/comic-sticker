@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('https://static.wixstatic.com/media/nsplsh_c549bb676c764efa93cf608a5928bfc0~mv2.jpg/v1/fill/w_1470,h_1568,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/nsplsh_c549bb676c764efa93cf608a5928bfc0~mv2.jpg');
+    background-size: cover; /* Make the background cover the whole area */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9); /* Add slight transparency for better visibility against background */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.text-inputs {
+    margin-bottom: 20px; /* Space below the text input section */
+}
+
+.text-inputs input {
+    margin-bottom: 10px; /* Space between individual text inputs */
+    width: 100%; /* Optional: Make inputs full width */
+    padding: 5px; /* Optional: Add padding for better appearance */
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+.upload-section, .controls, .text-inputs {
+    margin: 20px 0;
+}
+
+.image-preview {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+canvas {
+    border: 2px solid #ddd;
+    width: 300px;
+    height: 300px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+input[type="text"] {
+    margin: 5px 0;
+    padding: 8px;
+    width: 100%;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        margin: 10px;
+    }
+
+    canvas {
+        width: 250px;
+        height: 250px;
+    }
+
+    button {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+.draggable {
+    cursor: move; /* Change cursor to indicate draggable items */
+    margin-bottom: 10px; /* Space between inputs */
+}

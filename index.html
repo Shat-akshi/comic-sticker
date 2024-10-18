@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kid's Comic Sticker Generator</title>
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,7 +21,6 @@
         <!-- Image Preview -->
         <div class="image-preview">
             <canvas id="canvas" width="800" height="600"></canvas>
-
         </div>
 
         <!-- Image Adjustment -->
@@ -37,46 +38,201 @@
             <button id="move-down">Move Down</button>
             <button id="increase-font">Increase Font Size</button>
             <button id="decrease-font">Decrease Font Size</button>
-
         </div>
 
-        <!-- Text Inputs- Labels -->
-        <!-- <div class="text-inputs">
-            <h2>Add Text to Comic:</h2>
-            <label for="text1">Text 1:</label>
-            <input type="text" id="text1">
-            <label for="text2">Text 2:</label>
-            <input type="text" id="text2">
-            <label for="text3">Text 3:</label>
-            <input type="text" id="text3">
-            <label for="text4">Text 4:</label>
-            <input type="text" id="text4">
-        </div> -->
         <div class="text-inputs">
-            <h2>Add Text to Comic:</h2>
-            <div class="draggable" id="text1-container">
-                <label for="text1">Text 1:</label>
-                <input type="text" id="text1">
-            </div>
-            <div class="draggable" id="text2-container">
-                <label for="text2">Text 2:</label>
-                <input type="text" id="text2">
-            </div>
-            <div class="draggable" id="text3-container">
-                <label for="text3">Text 3:</label>
-                <input type="text" id="text3">
-            </div>
-            <div class="draggable" id="text4-container">
-                <label for="text4">Text 4:</label>
-                <input type="text" id="text4">
-            </div>
+            <h2>Enter Text for Label:</h2>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter Name">
+
+            <label for="standard">Standard:</label>
+            <input type="text" id="standard" placeholder="Enter Standard">
+
+            <label for="section">Section:</label>
+            <input type="text" id="section" placeholder="Enter Section">
+
+            <label for="school">School:</label>
+            <input type="text" id="school" placeholder="Enter School">
         </div>
         
-
         <!-- Download Btn -->
         <button id="download-btn">Download PNG</button>
     </div>
     
-    <script src="scripts.js"></script>
+    <script>
+        let uploadedImage = null;  // Store the uploaded image
+        let scale = 1;             // Default scale for zoom
+        let flipH = false;         // Horizontal flip state
+        let flipV = false;         // Vertical flip state
+        let posX = 100;            // Default X position
+        let posY = 100;            // Default Y position
+        let rotation = 0;         
+
+        const uploadImage = document.getElementById('upload-image');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const bgImagePath = "Picture1.png"; 
+    
+        const background = new Image();
+        background.src = bgImagePath;
+    
+        background.onload = function() {
+            ctx.drawImage(background, 0, 0, canvas.width, canvas.height); 
+        }
+    
+        uploadImage.addEventListener('change', function(event) {
+            const file = event.target.files[0];  
+            if (file) {
+                removeBackground(file);
+            }
+        });
+    
+        function removeBackground(imageFile) {
+            const formData = new FormData();
+            formData.append('image_file', imageFile); 
+    
+            fetch('https://api.remove.bg/v1.0/removebg', {
+                method: 'POST',
+                headers: {
+                    'X-Api-Key': 'mTcYkqWABT2RVjFn6c7n7b8j', // Replace with your actual API key
+                },
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Error removing background');
+                return response.blob(); 
+            })
+            .then(blob => {
+                const imgUrl = URL.createObjectURL(blob); 
+                uploadedImage = new Image();
+                uploadedImage.src = imgUrl; 
+
+                uploadedImage.onload = function()
+                {
+                    drawImage();
+                }
+    
+                img.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(background, 0, 0, canvas.width, canvas.height); 
+                    ctx.drawImage(img, 100, 100, 300, 300); 
+                };
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function drawImage() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
+            ctx.drawImage(background, 0, 0, canvas.width, canvas.height);  // Redraw background
+
+            if (uploadedImage) {
+                ctx.save();  // Save the current canvas state
+
+                // Move to the center of the image to rotate and scale from its center
+                ctx.translate(posX + (uploadedImage.width * scale) / 2, posY + (uploadedImage.height * scale) / 2);
+
+                // Apply the rotation and flipping
+                ctx.rotate(rotation * Math.PI / 180);  // Rotate the image
+                ctx.scale(flipH ? -scale : scale, flipV ? -scale : scale);  // Flip and scale the image
+
+                // Draw the uploaded image
+                ctx.drawImage(uploadedImage, -(uploadedImage.width / 2), -(uploadedImage.height / 2), uploadedImage.width, uploadedImage.height);
+
+                ctx.restore();  // Restore the canvas to its previous state
+            }
+            drawText();
+        }
+
+        function drawText() {
+        // Get text values from inputs
+            const name = document.getElementById('name').value;
+            const standard = document.getElementById('standard').value;
+            const section = document.getElementById('section').value;
+            const school = document.getElementById('school').value;
+
+            ctx.font = "bold 70px Arial";  // Set font for Name
+            ctx.fillStyle = "red";  // Text color
+            ctx.fillText(name, canvas.width / 2 - ctx.measureText(name).width / 2, 50);
+                 
+            ctx.font = "bold 45px Arial";            // Set smaller font for other details
+            ctx.fillStyle = 'blue';
+            ctx.fillText(standard, 400, 250);
+            ctx.fillText(section, 650, 250);
+            ctx.fillText(school, 480, 425);
+
+        }
+
+        document.getElementById('name').addEventListener('input', drawImage);
+        document.getElementById('standard').addEventListener('input', drawImage);
+        document.getElementById('section').addEventListener('input', drawImage);
+        document.getElementById('school').addEventListener('input', drawImage);
+
+
+        
+        document.getElementById('zoom-in').addEventListener('click', () => {
+            scale += 0.1;
+            drawImage();
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', () => {
+            if (scale > 0.1) {
+                scale -= 0.1;
+                drawImage();
+            }
+        });
+
+        document.getElementById('rotate-cw').addEventListener('click', () => {
+            rotation += 5;
+            drawImage();
+        });
+
+        document.getElementById('rotate-ccw').addEventListener('click', () => {
+            rotation -= 5;
+            drawImage();
+        });
+
+        document.getElementById('flip-horizontal').addEventListener('click', () => {
+            flipH = !flipH;
+            drawImage();
+        });
+
+        document.getElementById('flip-vertical').addEventListener('click', () => {
+            flipV = !flipV;
+            drawImage();
+        });
+
+        document.getElementById('move-left').addEventListener('click', () => {
+            posX -= 5;
+            drawImage();
+        });
+
+        document.getElementById('move-right').addEventListener('click', () => {
+            posX += 5;
+            drawImage();
+        });
+
+        document.getElementById('move-up').addEventListener('click', () => {
+            posY -= 5;
+            drawImage();
+        });
+
+        document.getElementById('move-down').addEventListener('click', () => {
+            posY += 5;
+            drawImage();
+        });
+
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.download = 'sticker.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+        
+       
+        
+    </script>
+    
 </body>
 </html>
